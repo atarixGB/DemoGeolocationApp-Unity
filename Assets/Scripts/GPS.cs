@@ -9,16 +9,17 @@ using UnityEngine.UI;
 public class GPS : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI[] textboxLabels;
+    
+    private float latitude;
+    private float longitude;
 
     private void Start()
     {
 
-        textboxLabels[0].text = "Target Longitude: ";
-        textboxLabels[1].text = "Target Latitude: ";
-        textboxLabels[2].text = "Distance from Target: ";
-        textboxLabels[3].text = "Current Longitude: ";
-        textboxLabels[4].text = "Current Latitude: ";
-        textboxLabels[5].text = "Current Rotation: ";
+        textboxLabels[0].text = "0";
+        textboxLabels[1].text = "0";
+        textboxLabels[2].text = "0";
+        textboxLabels[3].text = "0";
 
     }
     private void Update()
@@ -41,13 +42,15 @@ public class GPS : MonoBehaviour
 
             if (Input.location.status == LocationServiceStatus.Failed)
             {
-                print("Unable to determine device location");
+                Debug.Log("Unable to determine device location");
                 yield break;
             }
             else
             {
-                textboxLabels[3].text = Input.location.lastData.longitude.ToString();
-                textboxLabels[4].text = Input.location.lastData.latitude.ToString();
+                latitude = Input.location.lastData.latitude;
+                longitude = Input.location.lastData.longitude;
+                textboxLabels[2].text = latitude.ToString() + ", " + longitude.ToString();
+                Debug.Log("DEBUG: " + latitude.ToString() + ", " + longitude.ToString());
             }
 
         }
