@@ -3,59 +3,54 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Android;
 using UnityEngine.UI;
 
 public class GPS : MonoBehaviour
 {
-
-    private int maxWait = 30;
-    [SerializeField] TextMeshProUGUI[] textboxes; 
-
-    void Update()
-    {
-        
-    }
+    [SerializeField] TextMeshProUGUI[] textboxLabels;
 
     private void Start()
     {
-        textboxes[0].text = "Target Longitude: ";
-        textboxes[1].text = "Target Latitude: ";
-        textboxes[2].text = "Distance from Target: ";
-        textboxes[3].text = "Current Longitude: ";
-        textboxes[4].text = "Current Latitude:";
-        textboxes[5].text = "Current Rotation: ";
+
+        textboxLabels[0].text = "Target Longitude: ";
+        textboxLabels[1].text = "Target Latitude: ";
+        textboxLabels[2].text = "Distance from Target: ";
+        textboxLabels[3].text = "Current Longitude: ";
+        textboxLabels[4].text = "Current Latitude: ";
+        textboxLabels[5].text = "Current Rotation: ";
+
+    }
+    private void Update()
+    {
+        StartCoroutine(GetGPSCoordinates());
     }
 
     IEnumerator GetGPSCoordinates()
     {
 
-        if (!Input.location.isEnabledByUser)
-            yield break;
-
-        Input.location.Start();
-
-        while (Input.location.status == LocationServiceStatus.Initializing && maxWait > 0)
+        if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
         {
-            yield return new WaitForSeconds(1);
-            maxWait--;
+            Permission.RequestUserPermission(Permission.FineLocation);
+            Permission.RequestUserPermission(Permission.CoarseLocation);
         }
 
-        if (maxWait < 1)
+        if (Input.location.isEnabledByUser)
         {
-            Debug.Log("Timed Out");
-            yield break;
+            Input.location.Start();
+
+            if (Input.location.status == LocationServiceStatus.Failed)
+            {
+                print("Unable to determine device location");
+                yield break;
+            }
+            else
+            {
+                textboxLabels[3].text = Input.location.lastData.longitude.ToString();
+                textboxLabels[4].text = Input.location.lastData.latitude.ToString();
+            }
+
         }
 
-        if (Input.location.status == LocationServiceStatus.Failed)
-        {
-            Debug.Log("Unable to determine device location");
-            yield break;
-        } 
-        else
-        {
-            Debug.Log("Location: " + Input.location.lastData.latitude + " " + Input.location.lastData.longitude + " " + Input.location.lastData.altitude + " " + Input.location.lastData.horizontalAccuracy + " " + Input.location.lastData.timestamp);
-        }
-        
-        Input.location.Stop();
     }
 }
