@@ -20,14 +20,17 @@ public class GPS : MonoBehaviour
         textboxLabels[2].text = "0";
         textboxLabels[3].text = "0";
 
-        Tuple<double,double> target = Helper.getRandomGPSCoordinates(45.482186364233655, -73.63115833826637, 90, 2);
-        textboxLabels[4].text = target.ToString();
+        Tuple<double,double> target = Helper.getNewGPSCoordinate(45.499203131735904, -73.62257131469727, 33.253, 300);
+        textboxLabels[0].text = target.ToString();
+
+        double bearing = Helper.getBearing(45.499203131735904, -73.62257131469727, 45.501221536635335, -73.62068303955078);
+        textboxLabels[3].text = bearing.ToString();
 
     }
     private void Update()
     {
-        double distance = Helper.distanceBetweenTwoGPSCoordinates(45.482186364233655, -73.63115833826637, 45.50662296506298, -73.57023013517852);
-        textboxLabels[1].text = distance.ToString();
+        double distance = Helper.distanceBetweenTwoGPSCoordinates(45.499203131735904, -73.62257131469727, 45.501221536635335, -73.62068303955078);
+        textboxLabels[1].text = distance.ToString() + " m";
 
         StartCoroutine(GetGPSCoordinates());
     }
@@ -55,7 +58,6 @@ public class GPS : MonoBehaviour
                 latitude = Input.location.lastData.latitude;
                 longitude = Input.location.lastData.longitude;
                 textboxLabels[2].text = latitude.ToString() + ", " + longitude.ToString();
-                Debug.Log("DEBUG: " + latitude.ToString() + ", " + longitude.ToString());
             }
 
         }
