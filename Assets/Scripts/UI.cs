@@ -4,12 +4,15 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.UIElements.Experimental;
 
 public class UI : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI[] textboxLabels;
+    public  Image greenSquare;
     double randomBearing;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -31,6 +34,14 @@ public class UI : MonoBehaviour
         
         double distance = Helper.distanceBetweenTwoGPSCoordinates(GPS.Instance.latitude, GPS.Instance.longitude, GPS.Instance.randomCoordinates.Item1, GPS.Instance.randomCoordinates.Item2);
         textboxLabels[1].text = distance.ToString() + " m";
+
+        if (distance <= 10)
+        {
+            greenSquare.enabled = true;
+        } else
+        {
+            greenSquare.enabled = false;
+        }
 
         textboxLabels[2].text = string.Format("({0}, {1})", GPS.Instance.latitude.ToString(), GPS.Instance.longitude.ToString());
 
