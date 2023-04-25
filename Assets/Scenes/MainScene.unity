@@ -154,12 +154,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   latitude: 0
   longitude: 0
-  textboxLabels:
-  - {fileID: 78249162}
-  - {fileID: 1027038381}
-  - {fileID: 292096049}
-  - {fileID: 269182853}
-  - {fileID: 0}
+  distance: 200
 --- !u!4 &42838735
 Transform:
   m_ObjectHideFlags: 0

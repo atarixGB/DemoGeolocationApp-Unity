@@ -2,13 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements.Experimental;
 
 public class UI : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI[] textboxLabels;
-
-
+    double randomBearing;
     // Start is called before the first frame update
     void Start()
     {
@@ -17,19 +18,23 @@ public class UI : MonoBehaviour
         textboxLabels[2].text = "0";
         textboxLabels[3].text = "0";
 
-        Tuple<double, double> target = Helper.getNewGPSCoordinate(45.499203131735904, -73.62257131469727, 33.253, 300);
-        textboxLabels[0].text = target.ToString();
+        System.Random random = new System.Random(Helper.getElapsedSecondsFromUnixEpoch());
+        randomBearing = random.Next(361);
 
-        double distance = Helper.distanceBetweenTwoGPSCoordinates(45.499203131735904, -73.62257131469727, 45.501221536635335, -73.62068303955078);
-        textboxLabels[1].text = distance.ToString() + " m";
 
-        double bearing = Helper.getBearing(45.499203131735904, -73.62257131469727, 45.501221536635335, -73.62068303955078);
-        textboxLabels[3].text = bearing.ToString();
     }
 
     // Update is called once per frame
     void Update()
     {
-        textboxLabels[2].text = string.Format("({0},{1})", GPS.Instance.latitude.ToString(), GPS.Instance.longitude.ToString());
+        textboxLabels[0].text = GPS.Instance.randomCoordinates.ToString();
+        
+        double distance = Helper.distanceBetweenTwoGPSCoordinates(GPS.Instance.latitude, GPS.Instance.longitude, GPS.Instance.randomCoordinates.Item1, GPS.Instance.randomCoordinates.Item2);
+        textboxLabels[1].text = distance.ToString() + " m";
+
+        textboxLabels[2].text = string.Format("({0}, {1})", GPS.Instance.latitude.ToString(), GPS.Instance.longitude.ToString());
+
+        double bearing = Helper.getBearing(GPS.Instance.latitude, GPS.Instance.longitude, GPS.Instance.randomCoordinates.Item1, GPS.Instance.randomCoordinates.Item2);
+        textboxLabels[3].text = bearing.ToString() + " °";
     }
 }
