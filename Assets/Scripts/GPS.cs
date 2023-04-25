@@ -10,20 +10,25 @@ public class GPS : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI[] textboxLabels;
     
-    private float latitude;
-    private float longitude;
+    private double latitude;
+    private double longitude;
 
     private void Start()
     {
-
         textboxLabels[0].text = "0";
         textboxLabels[1].text = "0";
         textboxLabels[2].text = "0";
         textboxLabels[3].text = "0";
 
+        Tuple<double,double> target = Helper.getRandomGPSCoordinates(45.482186364233655, -73.63115833826637, 90, 2);
+        textboxLabels[4].text = target.ToString();
+
     }
     private void Update()
     {
+        double distance = Helper.distanceBetweenTwoGPSCoordinates(45.482186364233655, -73.63115833826637, 45.50662296506298, -73.57023013517852);
+        textboxLabels[1].text = distance.ToString();
+
         StartCoroutine(GetGPSCoordinates());
     }
 
