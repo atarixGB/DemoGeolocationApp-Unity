@@ -1,29 +1,24 @@
 using System;
-using Unity.VisualScripting;
-using UnityEngine;
 
 public static class Helper
 {
-    public const int TOTAL_DEGREES_IN_CIRCLE = 360; // [degrees]
+    public const int NB_DEGREES_IN_CIRCLE = 360; // [degrees]
     public const double EARTH_RADIUS = 6371000; // [meters]
 
-    public static double degreesToRadians(double valueInDegrees)
-    {
+    public static double degreesToRadians(double valueInDegrees) {
         return valueInDegrees * (Math.PI) / 180;
     }
 
-    public static double radiansToDegrees(double valueInRadians)
-    {
+    public static double radiansToDegrees(double valueInRadians) {
         return valueInRadians * 180 / Math.PI;
     }
 
     /** Destination point along great-circle given distance and bearing from start point
-    *   http://www.movable-type.co.uk/scripts/latlong.html
+    *   Source: http://www.movable-type.co.uk/scripts/latlong.html
     *   
     *   @return the new gps coordinate (lat,long) given the specified location and distance
     */
-    public static Tuple<double, double> getNewGPSCoordinate(double lat1, double long1, double bearing, double distance)
-    {
+    public static Tuple<double, double> getNewGPSCoordinate(double lat1, double long1, double bearing, double distance) {
         bearing = degreesToRadians(bearing);
         lat1 = degreesToRadians(lat1);
         long1 = degreesToRadians(long1);
@@ -34,12 +29,11 @@ public static class Helper
     }
 
     /** Great-circle distance between two points
-     *  http://www.movable-type.co.uk/scripts/latlong.html
+     *  Source: http://www.movable-type.co.uk/scripts/latlong.html
      *  
      *  @return the distance in meters
      */
-    public static double distanceBetweenTwoGPSCoordinates(double lat1, double long1, double lat2, double long2)
-    {
+    public static double distanceBetweenTwoGPSCoordinates(double lat1, double long1, double lat2, double long2) {
         double deltaLat = degreesToRadians(lat2 - lat1);
         double deltaLong = degreesToRadians(long2 - long1);
         double radicand = Math.Pow(Math.Sin(deltaLat / 2), 2) + Math.Cos(degreesToRadians(lat1)) * Math.Cos(degreesToRadians(lat2)) * Math.Pow(Math.Sin(deltaLong / 2), 2);
@@ -49,12 +43,11 @@ public static class Helper
     }
 
     /** Calculating Bearing or Heading angle between two points
-     *  https://www.igismap.com/formula-to-find-bearing-or-heading-angle-between-two-points-latitude-longitude/
+     *  Source: https://www.igismap.com/formula-to-find-bearing-or-heading-angle-between-two-points-latitude-longitude/
      *  
      *  @return the bearing in degrees
      */
-    public static double getBearing(double lat1, double long1, double lat2, double long2) 
-    {
+    public static double getBearing(double lat1, double long1, double lat2, double long2) {
         lat1 = degreesToRadians(lat1);
         long1 = degreesToRadians(long1);
         lat2 = degreesToRadians(lat2);
@@ -67,8 +60,7 @@ public static class Helper
         return radiansToDegrees(bearing);
     }
 
-    public static int getElapsedSecondsFromUnixEpoch()
-    {
+    public static int getElapsedSecondsFromUnixEpoch() {
         DateTime start = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         int current = (int)(DateTime.UtcNow - start).TotalSeconds;
         return current;

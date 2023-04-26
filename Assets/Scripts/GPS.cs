@@ -1,23 +1,20 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Android;
-using UnityEngine.UI;
 
 public class GPS : MonoBehaviour
 {
     public static GPS Instance { get; set; } // Enable access everywhere in the app
 
     [Tooltip("Use the Magnetic North if checked.")]
-    public bool isMagneticNorth = true;
-
-    [Tooltip("Upon's app initialization, spawn the new coordinates at specified distance.")]
-    public double distanceFromNewPoint = 200d;
+    public bool isMagneticNorth;
+    [Tooltip("Upon's app initialization, spawn the new coordinates at specified distance (in meters).")]
+    public double NewCoordinatesDistance;
     
     public Tuple<double, double> randomCoordinates;
     public Tuple<double, double> currentCoordinates;
+    [HideInInspector] public Vector3 attitude;
     [HideInInspector] public double north = 0d;
 
     private bool areCoordinatesEmpty = true;
@@ -26,69 +23,65 @@ public class GPS : MonoBehaviour
 
     private System.Random random;
 
-    private void Start()
-    {
+    private void Start() {
         Instance = this;
 
         random = new System.Random(Helper.getElapsedSecondsFromUnixEpoch());
-        randomBearing = random.Next(Helper.TOTAL_DEGREES_IN_CIRCLE + 1);
-    }
-    private void Update()
-    {
-        StartCoroutine(GetGPSCoordinates());
+        randomBearing = random.Next(Helper.NB_DEGREES_IN_CIRCLE + 1);
 
-        if (!areCoordinatesEmpty && !areRandomCoordinatesSet)
-        {
+        Input.gyro.enabled = true;
+    }
+    private void Update() {
+        StartCoroutine(getGPSCoordinates());
+
+        if (!areCoordinatesEmpty && !areRandomCoordinatesSet) {
             // Upon app's initialization, generate a new coordinate point with distance specified in the editor and random bearing angle
-            randomCoordinates = Helper.getNewGPSCoordinate(currentCoordinates.Item1, currentCoordinates.Item2, randomBearing, distanceFromNewPoint);
+            randomCoordinates = Helper.getNewGPSCoordinate(currentCoordinates.Item1, currentCoordinates.Item2, randomBearing, NewCoordinatesDistance);
             areRandomCoordinatesSet = true;
         }
     }
 
-    private void OnDestroy()
-    {
+    private void OnDestroy() {
         Input.location.Stop();
-        Debug.Log("App closed");
+        Input.compass.enabled = false;
+        Input.gyro.enabled = false;
     }
 
-    IEnumerator GetGPSCoordinates()
-    {
+    IEnumerator getGPSCoordinates() {
 
-        if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
-        {
+        if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation)) {
             Permission.RequestUserPermission(Permission.FineLocation);
             Permission.RequestUserPermission(Permission.CoarseLocation);
         }
 
-        if (Input.location.isEnabledByUser)
-        {
+        if (Input.location.isEnabledByUser) {
             Input.location.Start(5.0f,1.0f);
             Input.compass.enabled = true;
 
-            if (Input.location.status == LocationServiceStatus.Failed)
-            {
+            if (Input.location.status == LocationServiceStatus.Failed) {
                 Debug.Log("Unable to determine device location");
                 yield break;
-            }
-            else
-            {
+            } else {
                 currentCoordinates = new Tuple<double, double>(Input.location.lastData.latitude, Input.location.lastData.longitude);
-                Debug.Log(string.Format("TIME: {0}\tLAT: {1}\tLONG: {2}\tACC: {3}", Input.location.lastData.timestamp, currentCoordinates.Item1, currentCoordinates.Item2, Input.location.lastData.horizontalAccuracy));
+                attitude = Input.gyro.attitude.eulerAngles;
+                
+                Debug.Log(string.Format("TIME: {0}\tLAT: {1}\tLONG: {2}\tACC: {3}\tGYRO: {4}", 
+                    Input.location.lastData.timestamp, 
+                    currentCoordinates.Item1, 
+                    currentCoordinates.Item2, 
+                    Input.location.lastData.horizontalAccuracy,
+                    Input.gyro.attitude));
 
-                if (isMagneticNorth)
-                {
+                if (isMagneticNorth) {
                     north = Input.compass.magneticHeading;
-                } else
-                {
+                } else {
                     north = Input.compass.trueHeading;
                 }
                 
-                if (currentCoordinates.Item1 != 0d && currentCoordinates.Item2 != 0d)
-                {
+                if (currentCoordinates.Item1 != 0d && currentCoordinates.Item2 != 0d) {
                     areCoordinatesEmpty = false;
                 }
             }
-
         }
 
     }
