@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class Helper
 {
-    public const int TOTAL_DEGREES = 360; // [degrees]
+    public const int TOTAL_DEGREES_IN_CIRCLE = 360; // [degrees]
     public const double EARTH_RADIUS = 6371000; // [meters]
 
     public static double degreesToRadians(double valueInDegrees)
@@ -69,8 +69,8 @@ public static class Helper
 
     public static int getElapsedSecondsFromUnixEpoch()
     {
-        System.DateTime start = new System.DateTime(1970, 1, 1, 0, 0, 0, System.DateTimeKind.Utc);
-        int current = (int)(System.DateTime.UtcNow - start).TotalSeconds;
+        DateTime start = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        int current = (int)(DateTime.UtcNow - start).TotalSeconds;
         return current;
     }
 

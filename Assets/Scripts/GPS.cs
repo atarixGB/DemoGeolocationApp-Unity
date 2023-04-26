@@ -10,10 +10,15 @@ public class GPS : MonoBehaviour
 {
     public static GPS Instance { get; set; } // Enable access everywhere in the app
 
-    public double latitude = 0d;
-    public double longitude = 0d;
-    public double distance = 200d;
+    [Tooltip("Use the Magnetic North if checked.")]
+    public bool isMagneticNorth = true;
+
+    [Tooltip("Upon's app initialization, spawn the new coordinates at specified distance.")]
+    public double distanceFromNewPoint = 200d;
+    
     public Tuple<double, double> randomCoordinates;
+    public Tuple<double, double> currentCoordinates;
+    [HideInInspector] public double north = 0d;
 
     private bool areCoordinatesEmpty = true;
     private bool areRandomCoordinatesSet = false;
@@ -24,10 +29,9 @@ public class GPS : MonoBehaviour
     private void Start()
     {
         Instance = this;
-        DontDestroyOnLoad(gameObject);
 
         random = new System.Random(Helper.getElapsedSecondsFromUnixEpoch());
-        randomBearing = random.Next(Helper.TOTAL_DEGREES);
+        randomBearing = random.Next(Helper.TOTAL_DEGREES_IN_CIRCLE + 1);
     }
     private void Update()
     {
@@ -35,9 +39,16 @@ public class GPS : MonoBehaviour
 
         if (!areCoordinatesEmpty && !areRandomCoordinatesSet)
         {
-            randomCoordinates = Helper.getNewGPSCoordinate(latitude, longitude, randomBearing, distance);
+            // Upon app's initialization, generate a new coordinate point with distance specified in the editor and random bearing angle
+            randomCoordinates = Helper.getNewGPSCoordinate(currentCoordinates.Item1, currentCoordinates.Item2, randomBearing, distanceFromNewPoint);
             areRandomCoordinatesSet = true;
         }
+    }
+
+    private void OnDestroy()
+    {
+        Input.location.Stop();
+        Debug.Log("App closed");
     }
 
     IEnumerator GetGPSCoordinates()
@@ -51,7 +62,8 @@ public class GPS : MonoBehaviour
 
         if (Input.location.isEnabledByUser)
         {
-            Input.location.Start();
+            Input.location.Start(5.0f,1.0f);
+            Input.compass.enabled = true;
 
             if (Input.location.status == LocationServiceStatus.Failed)
             {
@@ -60,10 +72,18 @@ public class GPS : MonoBehaviour
             }
             else
             {
-                latitude = Input.location.lastData.latitude;
-                longitude = Input.location.lastData.longitude;
+                currentCoordinates = new Tuple<double, double>(Input.location.lastData.latitude, Input.location.lastData.longitude);
+                Debug.Log(string.Format("TIME: {0}\tLAT: {1}\tLONG: {2}\tACC: {3}", Input.location.lastData.timestamp, currentCoordinates.Item1, currentCoordinates.Item2, Input.location.lastData.horizontalAccuracy));
+
+                if (isMagneticNorth)
+                {
+                    north = Input.compass.magneticHeading;
+                } else
+                {
+                    north = Input.compass.trueHeading;
+                }
                 
-                if (latitude != 0d && longitude != 0d)
+                if (currentCoordinates.Item1 != 0d && currentCoordinates.Item2 != 0d)
                 {
                     areCoordinatesEmpty = false;
                 }

@@ -152,9 +152,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee283a9e39227d94d95d55a1d237f34c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isMagneticNorth: 1
+  distanceFromNewPoint: 200
   latitude: 0
   longitude: 0
-  distance: 200
+  north: 0
 --- !u!4 &42838735
 Transform:
   m_ObjectHideFlags: 0
@@ -163,7 +165,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 42838733}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -22.208004, y: 1160.5332, z: -19.810928}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -502,6 +504,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a40b1f74b3ed9464fb2957723a69cbff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  distanceThreshold: 1
   textboxLabels:
   - {fileID: 78249162}
   - {fileID: 1027038381}
